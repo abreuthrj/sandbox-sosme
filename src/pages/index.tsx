@@ -1,8 +1,10 @@
-import axios from "axios";
+import classNames from "classnames";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import useScriptLoader from "../utils/useScriptLoader";
+import { FaStar } from "react-icons/fa";
 
 interface FormType {
   place: string;
@@ -45,13 +47,22 @@ export default function Home() {
           {
             query: form.place,
             location: { lat, lng },
+            radius: 100,
           },
-          (res, status) => {
+          (res, status, pagination) => {
             console.log(res);
+            toast(`Found ${res.length} locations`, { type: "success" });
+
+            let sanitizedResult = res
+              .sort((a, b) => (a.rating > b.rating ? -1 : 1))
+              .sort((a, b) =>
+                a.opening_hours?.open_now && !b.opening_hours?.open_now ? -1 : 1
+              );
+
             setForm((prevState) => ({
               ...prevState,
               loading: false,
-              result: res,
+              result: sanitizedResult,
             }));
           }
         );
@@ -118,21 +129,60 @@ export default function Home() {
           />
         </form>
 
-        <table>
+        <table className="mt-12">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Endereço</th>
-              <th>Aberto</th>
+              <th className="text-left"></th>
+              <th className="text-left"></th>
+              <th className="text-left"></th>
+              <th className="text-left"></th>
+              <th className="text-left"></th>
             </tr>
           </thead>
           <tbody>
             {form.result.map((place) => (
-              <tr key={place.place_id}>
-                <td>{place.name}</td>
-                <td>{place.formatted_address}</td>
-                <td>{place.opening_hours?.isOpen() ? "SIM" : "NÃO"}</td>
-              </tr>
+              <React.Fragment key={place.place_id}>
+                <tr>
+                  <td>
+                    {place.photos &&
+                      place.photos.length > 0 &&
+                      place.photos[0].getUrl() && (
+                        <Image
+                          src={place.photos[0].getUrl()}
+                          alt={place.name}
+                          loading="lazy"
+                          width={108}
+                          height={108}
+                        />
+                      )}
+                  </td>
+                  <td className="p-4">{place.name}</td>
+                  <td className="p-4">
+                    {Array(Math.round(place.rating || 0))
+                      .fill(1)
+                      .map(() => (
+                        <FaStar color="#ffea00" className="inline-block" />
+                      ))}
+                  </td>
+                  <td className="p-4">{place.formatted_address}</td>
+                  <td className="p-4">
+                    <span
+                      className={classNames({
+                        "block w-4 h-4 rounded-full": true,
+                        "bg-green-500": place.opening_hours?.open_now,
+                        "bg-red-500": !place.opening_hours?.open_now,
+                      })}
+                    ></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-4"></td>
+                  <td className="p-4"></td>
+                  <td className="p-4"></td>
+                  <td className="p-4"></td>
+                  <td className="p-4"></td>
+                </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
