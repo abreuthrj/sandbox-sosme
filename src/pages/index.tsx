@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { FormEventHandler, useState } from "react";
 import { toast } from "react-toastify";
 import useScriptLoader from "../utils/useScriptLoader";
-import { FaStar } from "react-icons/fa";
+import { FaExternalLinkAlt, FaStar } from "react-icons/fa";
+import { GetStaticProps } from "next";
 
 interface FormType {
   place: string;
@@ -18,7 +19,11 @@ const initialFormState: FormType = {
   result: [],
 };
 
-export default function Home() {
+interface StaticHomeProps {
+  keywords: string[];
+}
+
+export default function Home({ keywords }: StaticHomeProps) {
   const { loaded } = useScriptLoader({
     src: `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_KEY}&libraries=places`,
     async: true,
@@ -26,8 +31,12 @@ export default function Home() {
 
   const [form, setForm] = useState(initialFormState);
 
-  const handleSearchPlace = () => {
+  // Handle data fetch from google api
+  const handleSearchPlace = (place: string) => {
+    // Check if script is loaded in DOM
     if (!loaded) return;
+
+    // Check if geolocation access is allowed
     if (!("geolocation" in navigator))
       return toast("Your navigator doesn't support geolocation", {
         type: "error",
@@ -37,33 +46,79 @@ export default function Home() {
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        // Get geolocation coords
         const { latitude: lat, longitude: lng } = pos.coords;
 
+        // Start google maps places service
         const placesService = new google.maps.places.PlacesService(
           document.createElement("div")
         );
 
+        // Request text search based on current coords
         placesService.textSearch(
           {
-            query: form.place,
+            query: place,
             location: { lat, lng },
             radius: 100,
           },
           (res, status, pagination) => {
             console.log(res);
+
+            // Check if status is different from OK and case yes, send a custom toast
+            if (status !== google.maps.places.PlacesServiceStatus.OK) {
+              setForm((prevState) => ({
+                ...prevState,
+                loading: false,
+              }));
+
+              if (
+                status ==
+                google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT
+              )
+                return toast("You can only make two searches per minute", {
+                  type: "info",
+                });
+
+              return toast("Something went wrong, try again", {
+                type: "error",
+              });
+            }
+
             toast(`Found ${res.length} locations`, { type: "success" });
 
+            // Sort result by best rate and opened first
             let sanitizedResult = res
-              .sort((a, b) => (a.rating > b.rating ? -1 : 1))
-              .sort((a, b) =>
-                a.opening_hours?.open_now && !b.opening_hours?.open_now ? -1 : 1
-              );
+              .filter((a) => a.opening_hours?.open_now)
+              .sort((a, b) => (a.rating > b.rating ? -1 : 1));
 
             setForm((prevState) => ({
               ...prevState,
               loading: false,
               result: sanitizedResult,
             }));
+
+            // sanitizedResult.forEach((place, i) => {
+            //   placesService.getDetails(
+            //     {
+            //       placeId: place.place_id,
+            //       fields: ["website", "opening_hours"],
+            //     },
+            //     (res, status) => {
+            //       console.log(res);
+
+            //       if (status == google.maps.places.PlacesServiceStatus.OK)
+            //         setForm((prevState) => ({
+            //           ...prevState,
+            //           result: prevState.result
+            //             .slice(0, i)
+            //             .concat(
+            //               [{ ...prevState.result[i], ...res }],
+            //               prevState.result.slice(i + 1)
+            //             ),
+            //         }));
+            //     }
+            //   );
+            // });
           }
         );
       },
@@ -88,28 +143,41 @@ export default function Home() {
     );
   };
 
+  const handleSelectKeyword = (kw: string) => {
+    setForm((prevState) => ({ ...prevState, place: kw }));
+    handleSearchPlace(kw);
+  };
+
+  const handleFormSubmit: FormEventHandler = (evt) => {
+    evt.preventDefault();
+
+    handleSearchPlace(form.place);
+  };
+
   return (
     <div>
       <Head>
         <title>SOSMe</title>
         <meta
           name="description"
-          content="SOSMe te ajuda a encontrar os serviços mais próximos de você que podem te ajudar"
+          content="SOSMe helps you to locate the best rated nearest places around you"
         />
       </Head>
 
       <header className="bg-blue-600 w-full p-12 text-white flex items-center justify-center flex-col">
-        <strong className="text-5xl">SoSMe</strong>
-        <span className="block border w-56 mb-4 mt-12"></span>
+        <strong className="text-5xl">SOSME</strong>
+
+        <span className="block border w-56 mb-4 mt-12 bg-white border-white"></span>
+
         <h1 className="text-3xl">
-          Te ajudando a encontrar o serviço mais próximo
+          Helping you to find the nearest best rated place
         </h1>
       </header>
 
       <main className="flex flex-col items-center p-12">
-        <form onSubmit={(evt) => evt.preventDefault()}>
+        <form onSubmit={handleFormSubmit}>
           <input
-            placeholder="Buscar (Ex. pia, mecânico, ...)"
+            placeholder="Search (Ex: restaurant, shopping, ...)"
             value={form.place}
             onChange={(evt) =>
               setForm((prevState) => ({
@@ -117,17 +185,34 @@ export default function Home() {
                 place: evt.target.value,
               }))
             }
-            className="border rounded-full py-3 px-8 outline-none"
+            className="rounded-full py-3 px-8 outline-none shadow-md border"
           />
 
           <input
             type="submit"
-            value="Buscar"
-            onClick={handleSearchPlace}
+            value={form.loading ? "Searching..." : "Search"}
             disabled={form.loading || !loaded}
-            className="border py-3 px-6 rounded-full bg-gray-50 text-gray-500 ml-4 hover:bg-gray-100 active:bg-gray-200 cursor-pointer"
+            className={classNames({
+              "py-3 px-6 ml-4 rounded-full text-gray-500 shadow-md border":
+                true,
+              "bg-gray-50 hover:bg-gray-100 active:bg-gray-200 cursor-pointer":
+                !form.loading && loaded,
+              "bg-gray-50": form.loading || !loaded,
+            })}
           />
         </form>
+
+        <div className="flex gap-2 my-12">
+          {keywords.map((kw) => (
+            <span
+              key={kw}
+              onClick={() => handleSelectKeyword(kw)}
+              className="px-4 bg-gray-100 rounded-full text-gray-500 cursor-pointer border transition-colors hover:bg-gray-50"
+            >
+              {kw}
+            </span>
+          ))}
+        </div>
 
         <table className="mt-12">
           <thead>
@@ -151,20 +236,48 @@ export default function Home() {
                           src={place.photos[0].getUrl()}
                           alt={place.name}
                           loading="lazy"
+                          objectFit="cover"
                           width={108}
                           height={108}
                         />
                       )}
                   </td>
-                  <td className="p-4">{place.name}</td>
+                  <td className="p-4">
+                    <a
+                      href={place.website}
+                      target="_blank"
+                      referrerPolicy="no-referrer"
+                      className={classNames({
+                        "flex items-center gap-1": true,
+                        "text-blue-600": !!place.website,
+                      })}
+                    >
+                      {place.name}
+                      {place.website && <FaExternalLinkAlt />}
+                    </a>
+                  </td>
                   <td className="p-4">
                     {Array(Math.round(place.rating || 0))
                       .fill(1)
-                      .map(() => (
-                        <FaStar color="#ffea00" className="inline-block" />
+                      .map((_, i) => (
+                        <FaStar
+                          key={`${place.place_id}-${place.rating}-${i}`}
+                          color="#ffea00"
+                          className="inline-block"
+                        />
                       ))}
                   </td>
-                  <td className="p-4">{place.formatted_address}</td>
+                  <td className="p-4">
+                    {place.formatted_address}
+                    <a
+                      target="_blank"
+                      referrerPolicy="no-referrer"
+                      href={`https://www.google.com/maps/place/${place.formatted_address}`}
+                      className="text-blue-500 flex items-center gap-2"
+                    >
+                      Open in Maps <FaExternalLinkAlt />
+                    </a>
+                  </td>
                   <td className="p-4">
                     <span
                       className={classNames({
@@ -192,3 +305,17 @@ export default function Home() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps<StaticHomeProps> = () => {
+  return {
+    props: {
+      keywords: [
+        "mecanico",
+        "pizzaria",
+        "hamburgueria",
+        "bar",
+        "loja de roupas",
+      ],
+    },
+  };
+};
