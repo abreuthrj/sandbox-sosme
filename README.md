@@ -4,7 +4,7 @@ You can view the result by [accessing the page](https://sandbox-sosme.vercel.app
 
 ## Screenshots
 
-
+![Preview](https://raw.githubusercontent.com/abreuthrj/sandbox-sosme/main/.github/images/sosme-preview.png)
 
 ## Configuration
 
