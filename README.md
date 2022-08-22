@@ -1,34 +1,79 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a project to help users to find the nearest open places with best rating so they can easily and quickly pick them.
 
-## Getting Started
+You can view the result by [accessing the page](https://sandbox-sosme.vercel.app).
 
-First, run the development server:
+## Screenshots
+
+
+
+## Configuration
+
+<table>
+  <tr>
+    <td>Framework</td>
+    <td>
+      <a href="https://nextjs.org/">Next</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Styling</td>
+    <td>
+      <a href="https://tailwindcss.com">Tailwind</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Deployment</td>
+    <td>
+      <a href="https://vercel.com">Vercel</a>
+    </td>
+  </tr>
+</table>
+
+## Environment
+
+This project counts on a `.env` file that should be based on `.env.example`, containing a google Places API key.
+
+## Running locally
 
 ```bash
-npm run dev
-# or
+yarn
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Package.json
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```json
+{
+  "name": "sandbox-sosme",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "classnames": "^2.3.1",
+    "next": "12.2.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.4.0",
+    "react-toastify": "^9.0.8"
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.3.1",
+    "@types/google.maps": "^3.49.2",
+    "@types/node": "^18.6.3",
+    "@types/react": "^18.0.15",
+    "@types/react-toastify": "^4.1.0",
+    "autoprefixer": "^10.4.8",
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.3",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.7",
+    "typescript": "^4.7.4"
+  }
+}
+```
