@@ -246,7 +246,7 @@ export default function Home({ keywords }: StaticHomeProps) {
                     <a
                       href={place.website}
                       target="_blank"
-                      referrerPolicy="no-referrer"
+                      rel="noreferrer"
                       className={classNames({
                         "flex items-center gap-1": true,
                         "text-blue-600": !!place.website,
@@ -271,7 +271,7 @@ export default function Home({ keywords }: StaticHomeProps) {
                     {place.formatted_address}
                     <a
                       target="_blank"
-                      referrerPolicy="no-referrer"
+                      rel="noreferrer"
                       href={`https://www.google.com/maps/place/${place.formatted_address}`}
                       className="text-blue-500 flex items-center gap-2"
                     >

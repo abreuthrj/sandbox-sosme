@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx prettier --write *.{js,jsx,ts,tsx}
+npx tsc
+yarn lint
+yarn build
