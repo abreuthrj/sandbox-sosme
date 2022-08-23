@@ -134,7 +134,7 @@ export default function Home({ keywords }: StaticHomeProps) {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <Head>
         <title>SOSMe</title>
         <meta name="description" content={langs.metaDescription} />
@@ -203,6 +203,7 @@ export default function Home({ keywords }: StaticHomeProps) {
               <th className="text-left"></th>
             </tr>
           </thead>
+
           <tbody>
             {form.result.map((place) => (
               <React.Fragment key={place.place_id}>
@@ -280,7 +281,7 @@ export default function Home({ keywords }: StaticHomeProps) {
         </table>
       </main>
 
-      <footer className="text-gray-400 text-xs text-center">
+      <footer className="text-gray-400 text-xs text-center mt-auto">
         <p>
           {langs.footerCredits}{" "}
           <a
