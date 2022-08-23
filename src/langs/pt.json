@@ -1,0 +1,20 @@
+{
+  "metaDescription": "SOSME Ajuda você a encontrar o lugar mais próximo e bem votado que está aberto no momento.",
+  "headerText": "Ajudando você a encontrar os lugares mais próximos",
+  "searchPlaceholder": "Buscar ( Ex: restaurante, shopping, etc... )",
+  "searchButton": "Buscar",
+  "searchButtonLoading": "Buscando...",
+  "keywords": [
+    "mecanico",
+    "lavanderia",
+    "livraria",
+    "loja de roupa",
+    "mercado",
+    "pizzaria",
+    "hamburgueria",
+    "bar"
+  ],
+  "footerText": "Todos os dados são extraidos do google maps API",
+  "footerCredits": "Desenvolvido por",
+  "footerPrivacy": "Nós apenas usamos sua localização para te mostrar os lugares mais próximos"
+}

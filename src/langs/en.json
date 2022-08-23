@@ -1,0 +1,20 @@
+{
+  "metaDescription": "SOSME Helps you to find the nearest best rated places around.",
+  "headerText": "Helping you to find the nearest best rated places",
+  "searchPlaceholder": "Search ( Ex: restaurant, shopping, etc... )",
+  "searchButton": "Search",
+  "searchButtonLoading": "Searching...",
+  "keywords": [
+    "mechanic",
+    "laundry",
+    "bookstore",
+    "clothes",
+    "market",
+    "pizzeria",
+    "burguer",
+    "bar"
+  ],
+  "footerText": "All data are extracted from google maps API",
+  "footerCredits": "Developed by",
+  "footerPrivacy": "We only use your location to server you the nearest places"
+}
