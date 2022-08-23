@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import useScriptLoader from "../utils/useScriptLoader";
 import { FaExternalLinkAlt, FaStar } from "react-icons/fa";
 import { GetStaticProps } from "next";
+import useLanguage from "../utils/useLanguage";
 
 interface FormType {
   place: string;
@@ -28,6 +29,7 @@ export default function Home({ keywords }: StaticHomeProps) {
     src: `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_KEY}&libraries=places`,
     async: true,
   });
+  const langs = useLanguage();
 
   const [form, setForm] = useState(initialFormState);
 
@@ -96,29 +98,6 @@ export default function Home({ keywords }: StaticHomeProps) {
               loading: false,
               result: sanitizedResult,
             }));
-
-            // sanitizedResult.forEach((place, i) => {
-            //   placesService.getDetails(
-            //     {
-            //       placeId: place.place_id,
-            //       fields: ["website", "opening_hours"],
-            //     },
-            //     (res, status) => {
-            //       console.log(res);
-
-            //       if (status == google.maps.places.PlacesServiceStatus.OK)
-            //         setForm((prevState) => ({
-            //           ...prevState,
-            //           result: prevState.result
-            //             .slice(0, i)
-            //             .concat(
-            //               [{ ...prevState.result[i], ...res }],
-            //               prevState.result.slice(i + 1)
-            //             ),
-            //         }));
-            //     }
-            //   );
-            // });
           }
         );
       },
@@ -158,10 +137,7 @@ export default function Home({ keywords }: StaticHomeProps) {
     <div>
       <Head>
         <title>SOSMe</title>
-        <meta
-          name="description"
-          content="SOSMe helps you to locate the best rated nearest places around you"
-        />
+        <meta name="description" content={langs.metaDescription} />
       </Head>
 
       <header className="bg-blue-600 w-full p-12 text-white flex items-center justify-center flex-col">
@@ -169,15 +145,16 @@ export default function Home({ keywords }: StaticHomeProps) {
 
         <span className="block border w-56 mb-4 mt-12 bg-white border-white"></span>
 
-        <h1 className="text-3xl">
-          Helping you to find the nearest best rated place
-        </h1>
+        <h1 className="text-3xl text-center">{langs.headerText}</h1>
       </header>
 
       <main className="flex flex-col items-center p-12">
-        <form onSubmit={handleFormSubmit}>
+        <form
+          onSubmit={handleFormSubmit}
+          className="flex flex-wrap justify-center gap-y-4"
+        >
           <input
-            placeholder="Search (Ex: restaurant, shopping, ...)"
+            placeholder={langs.searchPlaceholder}
             value={form.place}
             onChange={(evt) =>
               setForm((prevState) => ({
@@ -190,7 +167,9 @@ export default function Home({ keywords }: StaticHomeProps) {
 
           <input
             type="submit"
-            value={form.loading ? "Searching..." : "Search"}
+            value={
+              form.loading ? langs.searchButtonLoading : langs.searchButton
+            }
             disabled={form.loading || !loaded}
             className={classNames({
               "py-3 px-6 ml-4 rounded-full text-gray-500 shadow-md border":
@@ -202,8 +181,8 @@ export default function Home({ keywords }: StaticHomeProps) {
           />
         </form>
 
-        <div className="flex gap-2 my-12">
-          {keywords.map((kw) => (
+        <div className="flex gap-2 my-12 flex-wrap">
+          {langs.keywords.map((kw) => (
             <span
               key={kw}
               onClick={() => handleSelectKeyword(kw)}
@@ -301,21 +280,21 @@ export default function Home({ keywords }: StaticHomeProps) {
         </table>
       </main>
 
-      <footer></footer>
+      <footer className="text-gray-400 text-xs text-center">
+        <p>
+          {langs.footerCredits}{" "}
+          <a
+            href="https://github.com/abreuthrj"
+            rel="noreferrer"
+            target="_blank"
+            className="text-blue-400"
+          >
+            abreuthrj
+          </a>
+        </p>
+        <p>{langs.footerText}</p>
+        <p>{langs.footerPrivacy}</p>
+      </footer>
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps<StaticHomeProps> = () => {
-  return {
-    props: {
-      keywords: [
-        "mecanico",
-        "pizzaria",
-        "hamburgueria",
-        "bar",
-        "loja de roupas",
-      ],
-    },
-  };
-};
